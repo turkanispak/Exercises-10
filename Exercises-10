@@ -1,0 +1,225 @@
+#include <stdio.h>
+#include <math.h>
+
+//Function names are loyal to readme file's..
+
+char f0(void);
+int f1(void);
+int f2(int findbinary);
+int f3(int x, int findbinaryrep);
+int f4(int findsuperprime);
+int f5(int findprime);
+int f6(int findsumofdigs);
+void f7(int findweirdprime);
+
+int main(void)
+{
+	char desicion;
+	int result,number;
+	desicion = f0();
+	while (desicion != 'Q')
+	{
+		//Super prime checker
+		if (desicion == 'S')
+		{
+			number = f1();
+			if (f4(number)==1)
+				printf("%d is a super prime.\n",number);
+			else
+				printf("%d is not a super prime.\n",number);
+		}
+		//Binary equivalent calculator
+		else if (desicion == 'B')
+		{
+			number = f1();
+			result = f3(number, f2(number));
+			printf("Binary equivalent of %d is %d\n", number, result);
+		}
+		//Weird prime checker
+		else if (desicion == 'W')
+		{
+			number = f1();
+			f7(number);
+		}
+		
+		desicion = f0();
+	}
+	printf("Bye!\n");
+	return 0;
+}
+
+//Display following menu, get & return user input.
+char f0(void)
+{
+	char decide;
+
+	printf("Input S for super prime calculation, B for binary calculation, W for weird prime or Q to quit: ");
+	scanf(" %c",&decide);
+
+	return decide;
+}
+
+//Input a positive integer, return it to caller.
+int f1(void)
+{
+	int number;
+
+	//Force mechanism to obtain a positive integer.
+	do {
+
+		printf("Input an integer: ");
+		scanf("%d", &number);
+
+	} while (number < 0);
+
+	return number;
+}
+
+//Recieve integer, return # of digits of its binary equivalent.
+int f2(int findbinarydigit)
+{
+	int number, numberofdigits = 0;
+	number = findbinarydigit;
+
+	//0 is still a 1 digit number.
+	if (number == 0)
+		numberofdigits = 1;
+
+	//Count digit number.
+	while (number != 0)
+	{
+		number /= 2;
+		numberofdigits += 1;
+	}
+
+	return numberofdigits;
+}
+
+//Get 2 values of x, form binary equivalent & return it to caller.
+//brep should be f2(x)
+int f3(int x, int brep)
+{
+	int dividend, quotinent, remainder, count, binary = 0;
+	dividend = x;
+
+	//Construct from leftmost digit to rightmost.
+	for (count = brep - 1; 0 <= count; count--)
+	{
+		quotinent = dividend / (pow(2, count));
+		remainder = quotinent % 2;
+        binary = binary * 10 + remainder;
+	}
+
+	return binary;
+}
+
+
+//Recieve integer, return 1 if prime, 0 otherwise.
+int f5(int findprime)
+{
+	int count = 2, flag = 1;
+
+	//Flag variable acts as a 'break' structure.
+	while (count < findprime && flag == 1)
+	{
+		if (findprime % count == 0)
+			flag = 0;
+		count++;
+	}
+    
+	//2 is a prime number, it shouldn't return 0 for it.
+	if (flag == 0 && findprime != 2)
+		return 0;
+	else if (flag == 1 && findprime == 1)
+		return 0;
+	else
+		return 1;
+}
+
+//Recieve integer, return sum of its digits.
+int f6(int findsumofdigs)
+{
+	int number, digit, sum = 0;
+	number = findsumofdigs;
+	
+	while (number != 0)
+	{
+		digit = number % 10;
+		sum += digit;
+		number /= 10;
+	}
+
+	return sum;
+}
+
+//Recieve integer, output a message if given integer is weird prime or not.
+void f7(int findweirdprime)
+{
+	int rcount = 1, lcount = 0, rstate = 0, lstate = 0;
+	int rnumber, lnumber, lcopy, ldigit;
+
+	
+	rnumber = findweirdprime;
+	lnumber = findweirdprime;
+	if (f5(findweirdprime) == 1)
+	{
+		rcount = 0;
+		//Remove digits from right.
+		while (rnumber != 0)
+		{
+			rnumber /= 10;
+			rcount += 1;
+
+			rstate += f5(rnumber);
+		}
+		//Remove digits from left.
+		while (lnumber != 0)
+		{
+			lcopy = lnumber;
+			ldigit = 1;
+			//Find leftmost digit
+			while (lcopy > 9)
+			{
+				lcopy /= 10;
+				ldigit *= 10;
+			}
+			lnumber = lnumber % ldigit;
+			lcount += 1;
+
+			lstate += f5(lnumber);
+		}
+	}
+
+	//Check if created numbers are prime.
+	if ((lcount + rcount) == (lstate + rstate))
+		printf("%d is a weird prime.\n", findweirdprime);
+	else
+		printf("%d is not a weird prime.\n", findweirdprime);
+}
+
+
+//Recieve integer, return 1 if superprime, 0 otherwise.
+int f4(int findsuperprime)
+{
+	int number, count = 1, state = 0;
+	number = findsuperprime;
+
+	if (f5(number) == 1)
+	{
+		state += f5(number);
+		while (number > 9)
+		{
+			//Update number with sum of its digits & count it.
+			number = f6(number);
+			count += 1;
+			//Check if updated number is prime.
+			state += f5(number);
+		}
+
+	}
+
+	if (state == count)
+		return 1;
+	else
+		return 0;
+}
